@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Event Sender — Zod Data Service Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Event Sender</h1>
+      <p class="sub">
+        Click a scenario → POST to
+        <code id="api-base"></code>
+        → Zod validates → pipeline routes
+      </p>
+    </header>
+
+    <main>
+      <section class="scenarios">
+        <h2>Scenarios</h2>
+        <div id="scenario-grid" class="grid"></div>
+      </section>
+
+      <section class="response">
+        <h2>Last response</h2>
+        <div id="response-meta" class="meta">no request sent yet</div>
+        <pre id="response-body"><code>—</code></pre>
+      </section>
+    </main>
+
+    <footer>
+      <a id="kafka-link" target="_blank">Open Kafka UI</a>
+      <a id="apicurio-link" target="_blank">Open Apicurio UI</a>
+      <a id="swagger-link" target="_blank">Open Swagger</a>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

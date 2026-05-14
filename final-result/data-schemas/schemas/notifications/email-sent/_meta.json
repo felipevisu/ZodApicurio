@@ -1,0 +1,8 @@
+{
+  "name": "Email Sent",
+  "compatibility": "BACKWARD",
+  "labels": {
+    "pipeline.actions": "kafka",
+    "pipeline.kafka.topic": "notifications.email-sent"
+  }
+}

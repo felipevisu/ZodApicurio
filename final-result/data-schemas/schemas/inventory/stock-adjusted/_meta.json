@@ -1,0 +1,9 @@
+{
+  "name": "Stock Adjusted",
+  "compatibility": "BACKWARD",
+  "labels": {
+    "pipeline.actions": "kafka,database",
+    "pipeline.kafka.topic": "inventory.stock-adjusted",
+    "pipeline.database.table": "stock_adjustments"
+  }
+}

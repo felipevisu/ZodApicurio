@@ -1,0 +1,43 @@
+{
+  "$id": "inventory.stock-adjusted.v2",
+  "type": "object",
+  "required": ["sku", "warehouseId", "delta", "reason", "adjustedAt"],
+  "properties": {
+    "sku": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 64,
+      "pattern": "^[A-Z0-9-]+$"
+    },
+    "warehouseId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "delta": {
+      "type": "integer",
+      "minimum": -100000,
+      "maximum": 100000
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "restock",
+        "sale",
+        "damage",
+        "loss",
+        "return",
+        "audit",
+        "transfer",
+        "correction",
+        "expired"
+      ]
+    },
+    "operatorId": {
+      "type": "string"
+    },
+    "adjustedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+name: demo-3 — publish schemas after merge
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "demo-3/schemas/**/*.json"
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Determine changed schemas
+        id: changed
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            FILES=$(find demo-3/schemas -type f -name "*.json" | tr '\n' ' ')
+          else
+            FILES=$(git diff --name-only --diff-filter=AM "${{ github.event.before }}" "${{ github.sha }}" \
+              | grep -E '^demo-3/schemas/.*\.json$' || true)
+            FILES=$(echo "$FILES" | tr '\n' ' ')
+          fi
+          echo "files=${FILES}" >> "$GITHUB_OUTPUT"
+          echo "Will publish: ${FILES:-<none>}"
+
+      - name: Publish changed schemas
+        if: steps.changed.outputs.files != ''
+        env:
+          APICURIO_URL: ${{ secrets.APICURIO_URL_DEMO3 }}
+          WRITE_TOKEN: ${{ secrets.APICURIO_WRITE_TOKEN_DEMO3 }}
+          GROUP_ID: ${{ vars.APICURIO_GROUP_ID_DEMO3 || 'demo' }}
+        run: |
+          set -euo pipefail
+          chmod +x demo-3/scripts/publish-schema.sh
+          for f in ${{ steps.changed.outputs.files }}; do
+            echo "::group::Publish $f"
+            ./demo-3/scripts/publish-schema.sh "$f"
+            echo "::endgroup::"
+          done

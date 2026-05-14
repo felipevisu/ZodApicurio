@@ -1,0 +1,494 @@
+/* ==========================================================
+   Apicurio + Zod — reveal.js custom theme
+   Dark, technical, contract-first
+   ========================================================== */
+
+:root {
+  --bg: #0d1117;
+  --bg-elev: #161b22;
+  --bg-card: #1c2230;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text-dim: #8b949e;
+  --accent: #79c0ff;
+  --accent-warm: #ffa657;
+  --good: #3fb950;
+  --bad: #f85149;
+  --code-bg: #0a0e14;
+  --mono: "JetBrains Mono", "Fira Code", "SF Mono", Menlo, Consolas, monospace;
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.reveal {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+}
+
+.reveal-viewport {
+  background: radial-gradient(ellipse at top, #161b22 0%, #0d1117 70%);
+}
+
+/* Headings */
+.reveal h1,
+.reveal h2,
+.reveal h3 {
+  color: var(--text);
+  font-family: var(--sans);
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 0 0 0.6em;
+  text-shadow: none;
+}
+
+.reveal h1 { font-size: 2.6em; }
+.reveal h2 {
+  font-size: 1.7em;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0.35em;
+  margin-bottom: 0.7em;
+}
+.reveal h3 { font-size: 1.1em; color: var(--accent); margin-bottom: 0.35em; }
+
+.accent { color: var(--accent); }
+strong { color: var(--text); font-weight: 700; }
+em { color: var(--text-dim); font-style: italic; }
+
+.reveal p { line-height: 1.5; margin: 0 0 0.8em; }
+
+/* Lists */
+.reveal ul, .reveal ol { display: block; margin-left: 0; }
+.reveal ul li, .reveal ol li {
+  margin: 0.4em 0;
+  line-height: 1.5;
+}
+.reveal ul.bullets li { list-style: none; padding-left: 1.4em; position: relative; }
+.reveal ul.bullets li::before {
+  content: "▸";
+  position: absolute; left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Code */
+.reveal code {
+  font-family: var(--mono);
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.08em 0.4em;
+  font-size: 0.9em;
+  color: var(--accent-warm);
+}
+
+.reveal pre {
+  width: 100%;
+  margin: 0.4em 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+  overflow: hidden;
+}
+.reveal pre.mermaid {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5em;
+}
+.reveal pre.mermaid svg {
+  max-height: 70vh;
+  width: auto !important;
+  min-height: 50vh;
+}
+.reveal pre code {
+  display: block;
+  padding: 1em 1.2em;
+  font-size: 0.95em;
+  line-height: 1.55;
+  background: var(--code-bg);
+  border: none;
+  border-radius: 0;
+  color: var(--text);
+  max-height: none;
+  overflow: auto;
+}
+
+/* ==========================================================
+   Slide 1 — Title
+   ========================================================== */
+.title-slide {
+  text-align: left;
+}
+.hero-title {
+  font-size: 3.2em !important;
+  font-weight: 800 !important;
+  line-height: 1.05 !important;
+  margin-bottom: 0.5em !important;
+  letter-spacing: -0.03em !important;
+}
+.hero-sub {
+  font-size: 1em;
+  color: var(--text-dim);
+  margin-bottom: 1.6em !important;
+  max-width: 90%;
+  line-height: 1.4 !important;
+}
+.hero-stack {
+  font-size: 0.85em;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  padding-top: 1em;
+}
+.hero-stack strong { color: var(--accent); }
+
+/* ==========================================================
+   Slide 2 — Three cards
+   ========================================================== */
+.reveal .slides section.slide-center {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+}
+.three-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2em;
+  margin-top: 1em;
+}
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.4em 1.2em;
+  text-align: left;
+}
+.card-label {
+  font-family: var(--mono);
+  font-size: 0.65em;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--bad);
+  margin-bottom: 0.8em;
+  font-weight: 700;
+}
+.card p {
+  font-size: 0.78em;
+  line-height: 1.5;
+  margin: 0;
+  color: var(--text);
+}
+.card--bad { border-left: 4px solid var(--bad); }
+
+/* ==========================================================
+   Slide 3 — Big quote + checklist
+   ========================================================== */
+.big-quote {
+  font-size: 1.5em !important;
+  font-weight: 600;
+  line-height: 1.3 !important;
+  text-align: center;
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  padding: 1em 0 !important;
+  margin: 0.5em auto 1em !important;
+  width: 100% !important;
+  max-width: 90%;
+  color: var(--text);
+}
+.checklist {
+  list-style: none !important;
+  margin-left: 0 !important;
+  max-width: 80%;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.checklist li {
+  padding: 0.6em 0 0.6em 2em;
+  position: relative;
+  font-size: 0.9em;
+  border-bottom: 1px solid var(--border);
+}
+.checklist li:last-child { border-bottom: none; }
+.checklist li::before {
+  content: "✓";
+  position: absolute; left: 0.4em;
+  color: var(--good);
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+/* Lede paragraph (intro line under H2) */
+.lede {
+  font-size: 0.95em;
+  color: var(--text-dim);
+  line-height: 1.45;
+  margin: -0.3em 0 1em !important;
+  border-left: 3px solid var(--accent);
+  padding-left: 0.9em;
+}
+
+/* ==========================================================
+   Slide 4 — Concept grid
+   ========================================================== */
+.four-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 1em;
+  margin-top: 0.8em;
+}
+.concept {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2em 1.3em;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+}
+.concept::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--accent);
+}
+.concept-num {
+  font-family: var(--mono);
+  font-size: 0.7em;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  font-weight: 700;
+  margin-bottom: 0.3em;
+}
+.concept h3 {
+  font-size: 1em !important;
+  margin: 0 0 0.4em !important;
+  color: var(--text) !important;
+}
+.concept p {
+  font-size: 0.75em;
+  margin: 0;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+/* ==========================================================
+   Slide 5 — ASCII diagram
+   ========================================================== */
+.ascii-diagram {
+  background: var(--code-bg) !important;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 !important;
+  margin: 0.5em auto !important;
+  max-width: 100%;
+  width: 100%;
+}
+.ascii-diagram code {
+  font-family: var(--mono) !important;
+  font-size: 0.72em !important;
+  color: var(--accent) !important;
+  line-height: 1.4 !important;
+  background: transparent !important;
+  border: none !important;
+  white-space: pre;
+  padding: 1.4em !important;
+  text-align: center;
+}
+
+/* ==========================================================
+   Demo slides
+   ========================================================== */
+.demo-tag {
+  display: inline-block;
+  background: var(--accent-warm);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 0.55em;
+  padding: 0.25em 0.7em;
+  border-radius: 4px;
+  vertical-align: middle;
+  letter-spacing: 0.1em;
+  font-weight: 800;
+  margin-right: 0.3em;
+}
+.demo-action {
+  font-size: 0.85em;
+  color: var(--text-dim);
+  font-style: italic;
+  margin: 0.5em 0 1em !important;
+}
+.demo-callout {
+  font-size: 0.85em !important;
+  color: var(--accent);
+  background: rgba(121, 192, 255, 0.08);
+  border-left: 3px solid var(--accent);
+  padding: 0.6em 1em !important;
+  border-radius: 0 6px 6px 0;
+  margin: 0.8em 0 0 !important;
+}
+
+/* ==========================================================
+   Slide 11 — Code side-by-side
+   ========================================================== */
+.code-side-by-side {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8em;
+  margin-top: 0.5em;
+}
+.code-label {
+  font-family: var(--mono);
+  font-size: 0.6em;
+  color: var(--accent-warm);
+  margin: 0 0 0.3em !important;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.code-side-by-side pre code {
+  font-size: 0.95em !important;
+  padding: 1.1em !important;
+  line-height: 1.55 !important;
+}
+
+/* ==========================================================
+   Slide 12 — Two columns
+   ========================================================== */
+.two-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2em;
+  margin-top: 0.8em;
+}
+.column {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2em 1.4em;
+  text-align: left;
+}
+.column h3 {
+  font-size: 1em !important;
+  margin-bottom: 0.7em !important;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid var(--border);
+}
+.column ul {
+  list-style: none !important;
+  margin: 0 !important;
+}
+.column li {
+  font-size: 0.62em;
+  padding: 0.45em 0 0.45em 1.4em;
+  position: relative;
+  line-height: 1.35;
+  border-bottom: 1px dashed var(--border);
+}
+.column li:last-child { border-bottom: none; }
+.column--good h3 { color: var(--good); }
+.column--good li::before {
+  content: "+";
+  position: absolute; left: 0.3em;
+  color: var(--good);
+  font-weight: 800;
+}
+.column--bad h3 { color: var(--accent-warm); }
+.column--bad li::before {
+  content: "−";
+  position: absolute; left: 0.3em;
+  color: var(--accent-warm);
+  font-weight: 800;
+}
+
+/* ==========================================================
+   Slide 13 — Conclusions
+   ========================================================== */
+.conclusion-slide { text-align: center; }
+.conclusions {
+  list-style: none !important;
+  margin: 0 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8em;
+  max-width: 85%;
+  margin: 0 auto !important;
+}
+.conclusions li {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  align-items: center;
+  text-align: left;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1em 1.4em;
+}
+.big-num {
+  font-family: var(--mono);
+  font-size: 2.2em;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+.conclusions p {
+  margin: 0 !important;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+.thanks {
+  margin-top: 1.4em !important;
+  font-size: 1.1em;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+/* ==========================================================
+   Reveal chrome tweaks
+   ========================================================== */
+.reveal .progress {
+  color: var(--accent);
+  height: 3px;
+}
+.reveal .controls {
+  color: var(--text-dim);
+}
+.reveal .slide-number {
+  font-family: var(--mono);
+  font-size: 14px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--text-dim);
+}
+
+/* Scrollbars in code blocks */
+.reveal pre code::-webkit-scrollbar { height: 6px; width: 6px; }
+.reveal pre code::-webkit-scrollbar-track { background: transparent; }
+.reveal pre code::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Make sure section content does not overflow */
+.reveal .slides section {
+  text-align: left;
+  height: 100%;
+}
+.reveal .slides section.title-slide,
+.reveal .slides section.conclusion-slide {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+}

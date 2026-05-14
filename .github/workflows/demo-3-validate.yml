@@ -1,0 +1,58 @@
+name: demo-3 — validate schema compatibility (PR gate)
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "demo-3/schemas/**/*.json"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Determine changed schemas
+        id: changed
+        run: |
+          set -euo pipefail
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          FILES=$(git diff --name-only --diff-filter=AM "$BASE_SHA" "$HEAD_SHA" \
+            | grep -E '^demo-3/schemas/.*\.json$' || true)
+          FILES=$(echo "$FILES" | tr '\n' ' ')
+          echo "files=${FILES}" >> "$GITHUB_OUTPUT"
+          echo "Will validate: ${FILES:-<none>}"
+
+      - name: Dry-run validate changed schemas
+        if: steps.changed.outputs.files != ''
+        env:
+          APICURIO_URL: ${{ secrets.APICURIO_URL_DEMO3 }}
+          WRITE_TOKEN: ${{ secrets.APICURIO_WRITE_TOKEN_DEMO3 }}
+          GROUP_ID: ${{ vars.APICURIO_GROUP_ID_DEMO3 || 'demo' }}
+        run: |
+          set -euo pipefail
+          chmod +x demo-3/scripts/validate-schema.sh demo-3/scripts/strict-backward-check.sh
+          FAIL=0
+          for f in ${{ steps.changed.outputs.files }}; do
+            echo "::group::Apicurio dry-run: $f"
+            if ! ./demo-3/scripts/validate-schema.sh "$f"; then
+              FAIL=1
+            fi
+            echo "::endgroup::"
+            echo "::group::Strict BACKWARD check: $f"
+            if ! ./demo-3/scripts/strict-backward-check.sh "$f"; then
+              FAIL=1
+            fi
+            echo "::endgroup::"
+          done
+          if [[ "$FAIL" == "1" ]]; then
+            echo "One or more schemas are incompatible with registered versions."
+            exit 1
+          fi

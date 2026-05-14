@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>Contract-Driven Data Ingestion</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/black.css"
+      id="theme"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- Slide 1: Title -->
+        <section class="title-slide">
+          <h1 class="hero-title">
+            Contract-Driven<br /><span class="accent"
+              >Data Ingestion</span
+            >
+          </h1>
+          <p class="hero-sub">
+            JSON Schemas → Automatic validators → Real-time routed pipelines
+          </p>
+          <p class="hero-stack">
+            <em>Built with</em> <strong>Apicurio Registry</strong> +
+            <strong>Zod</strong>
+          </p>
+        </section>
+
+        <!-- Slide 2: The cultural problem -->
+        <section class="slide-center">
+          <h2>The cultural problem</h2>
+          <div class="three-cards">
+            <div class="card card--bad">
+              <div class="card-label">Today</div>
+              <p>
+                The data team <strong>pulls</strong>. Reads tables, runs CDC,
+                scrapes logs, builds pipelines on top of schemas it doesn't
+                control.
+              </p>
+            </div>
+            <div class="card card--bad">
+              <div class="card-label">When it changes</div>
+              <p>
+                Pipeline breaks. <strong>No warning.</strong> No versioning.
+                No clear owner.
+              </p>
+            </div>
+            <div class="card card--bad">
+              <div class="card-label">Inverted culture</div>
+              <p>
+                Whoever produces the data should <strong>deliver it</strong>,
+                not be hunted down.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 3: The inversion -->
+        <section>
+          <h2>The inversion</h2>
+          <blockquote class="big-quote">
+            The data team <span class="accent">defines</span> the contract.<br />
+            Producers <span class="accent">deliver</span> inside the
+            contract.
+          </blockquote>
+          <ul class="checklist">
+            <li>
+              Producers own <strong>responsibility</strong> for the format.
+            </li>
+            <li>
+              Consumers get <strong>guarantees</strong> about what arrives.
+            </li>
+            <li>
+              Changes become <strong>pull requests</strong> — not surprises in
+              production.
+            </li>
+          </ul>
+        </section>
+
+        <!-- Slide 4: Key concepts -->
+        <section>
+          <h2>Key concepts</h2>
+          <div class="four-grid">
+            <div class="concept">
+              <div class="concept-num">01</div>
+              <h3>Contract-first</h3>
+              <p>JSON Schema is the main artifact, not a detail.</p>
+            </div>
+            <div class="concept">
+              <div class="concept-num">02</div>
+              <h3>Single source</h3>
+              <p>Apicurio Registry stores every version.</p>
+            </div>
+            <div class="concept">
+              <div class="concept-num">03</div>
+              <h3>Generated validators</h3>
+              <p>Automatically. Never hand-written.</p>
+            </div>
+            <div class="concept">
+              <div class="concept-num">04</div>
+              <h3>Compatibility</h3>
+              <p>Every change passes through a backward-compat gate.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 6a: What is Apicurio -->
+        <section>
+          <h2>What is <span class="accent">Apicurio</span>?</h2>
+          <p class="lede">
+            Open-source schema registry maintained by Red Hat.<br />Single
+            source of truth for API and event contracts.
+          </p>
+          <div class="four-grid">
+            <div class="concept">
+              <div class="concept-num">FORMATS</div>
+              <h3>Multi-schema</h3>
+              <p>JSON Schema, Avro, Protobuf, OpenAPI, AsyncAPI, GraphQL.</p>
+            </div>
+            <div class="concept">
+              <div class="concept-num">VERSIONING</div>
+              <h3>Full history</h3>
+              <p>Every artifact has immutable versions + labels + metadata.</p>
+            </div>
+            <div class="concept">
+              <div class="concept-num">RULES</div>
+              <h3>Native compat</h3>
+              <p>
+                <code>BACKWARD</code>, <code>FORWARD</code>, <code>FULL</code>,
+                <code>NONE</code> — enforced at publish time.
+              </p>
+            </div>
+            <div class="concept">
+              <div class="concept-num">INTEGRATION</div>
+              <h3>REST + UI + SerDes</h3>
+              <p>
+                HTTP API v3, web console, libs for Kafka producers/consumers.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <!-- DEMO 1 (Apicurio): Registry — where the contract lives -->
+        <section>
+          <h2>
+            <span class="demo-tag">DEMO 1</span> Registry — where the contract lives
+          </h2>
+          <p class="demo-action">
+            Open Apicurio UI → upload
+            <code>product-schema.json</code>.
+          </p>
+          <pre><code class="hljs language-bash" data-trim>
+cd ~/ApicurioAndZod/demo-1
+docker compose up -d
+open http://localhost:18888
+
+# Permanent contract URL — what the consumer queries
+curl -s http://localhost:18080/apis/registry/v3/groups/demo/\
+artifacts/product/versions/branch=latest/content | jq
+        </code></pre>
+          <p class="demo-callout">
+            Each schema has a permanent URL. Version, group, artifact — all in
+            the path.
+          </p>
+        </section>
+
+        <!-- DEMO 2 (Apicurio): Publishing via CI — merge creates artifact -->
+        <section>
+          <h2>
+            <span class="demo-tag">DEMO 2</span> Publishing via CI — merge creates
+            artifact
+          </h2>
+          <p class="demo-action">
+            Show merged PR on GitHub → Action publishes → artifact appears in
+            the registry.
+          </p>
+          <pre><code class="hljs language-bash" data-trim>
+# Stack exposed via ngrok so the GitHub Action can reach it
+cd ~/ApicurioAndZod/demo-2
+docker compose up -d
+ngrok http 28080
+
+# Workflow in the repo
+.github/workflows/demo-2-publish-schemas.yml
+  └─ on push main + paths demo-2/schemas/**/*.json
+  └─ POST X-Auth-Token → /apis/registry/v3/groups/.../artifacts
+
+# Flow: PR approved → merge to main → Action runs → schema in registry
+        </code></pre>
+          <p class="demo-callout">
+            Only process that writes to the registry = CI. Audit trail =
+            <code>git log</code>.
+          </p>
+        </section>
+
+        <!-- DEMO 3 (Apicurio): Compatibility — PR fails when contract breaks -->
+        <section>
+          <h2>
+            <span class="demo-tag">DEMO 3</span> Compatibility — PR fails when
+            contract breaks
+          </h2>
+          <p class="demo-action">
+            Open PR with breaking version → workflow calls dry-run → check
+            turns red.
+          </p>
+          <pre><code class="hljs language-bash" data-trim>
+cd ~/ApicurioAndZod/demo-3   # compatibility + PR gate
+
+# Active rule in the registry
+curl -s http://localhost:38080/apis/registry/v3/admin/rules/COMPATIBILITY
+# {"ruleType":"COMPATIBILITY","config":"BACKWARD"}
+
+# Pre-built breaking version (new required phone field)
+git show test-compat-break-add-required-phone:demo-3/schemas/user.json \
+  > /tmp/breaking.json
+
+# Dry-run — same call the PR makes in CI
+TOKEN=$(grep WRITE_TOKEN .env | cut -d= -f2)
+APICURIO_URL=http://localhost:38080 WRITE_TOKEN=$TOKEN GROUP_ID=demo \
+  ./scripts/validate-schema.sh /tmp/breaking.json user
+
+# → HTTP 409
+#   OBJECT_TYPE_REQUIRED_PROPERTIES_MEMBER_ADDED at /required
+        </code></pre>
+          <p class="demo-callout">
+            PR check red. Branch protection blocks the merge.
+          </p>
+        </section>
+
+        <!-- Slide 6b: What is Zod -->
+        <section>
+          <h2>What is <span class="accent">Zod</span>?</h2>
+          <p class="lede">
+            TypeScript-first validation library.<br />Single schema → inferred
+            TS type + runtime validator.
+          </p>
+          <div class="code-side-by-side">
+            <div>
+              <p class="code-label">define schema</p>
+              <pre><code class="hljs language-typescript" data-trim>
+import { z } from "zod";
+
+const Refund = z.object({
+  id: z.string().uuid(),
+  amount: z.number().positive(),
+  reason: z.enum(["fraud", "duplicate", "other"]),
+  refundedAt: z.string().datetime()
+});
+
+type Refund = z.infer&lt;typeof Refund&gt;;
+// ↑ TS type generated for free
+</code></pre>
+            </div>
+            <div>
+              <p class="code-label">parse at runtime</p>
+              <pre><code class="hljs language-typescript" data-trim>
+const result = Refund.safeParse(input);
+
+if (!result.success) {
+  result.error.issues;
+  // [{ path: ["amount"],
+  //    message: "...",
+  //    code: "too_small" }]
+}
+
+result.data; // typed as Refund
+</code></pre>
+            </div>
+          </div>
+          <p class="demo-callout">
+            Composable: <code>z.object</code>, <code>z.array</code>,
+            <code>z.union</code>, <code>.refine</code>, <code>.transform</code>.
+            Zero deps. Tree-shakeable.
+          </p>
+        </section>
+
+        <!-- DEMO 4 (Zod): Zod — validator + TS type -->
+        <section>
+          <h2>
+            <span class="demo-tag">DEMO 4</span> Zod — validator + TS type
+          </h2>
+          <pre><code class="hljs language-bash" data-trim>
+cd ~/ApicurioAndZod/demo-4
+npm run demo
+        </code></pre>
+          <pre><code class="hljs language-typescript" data-trim>
+const User = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  age: z.number().int().min(0),
+  role: z.enum(["admin", "user"]),
+});
+
+type User = z.infer&lt;typeof User&gt;;   // TS type for free
+
+User.parse(good);                    // valid payload → typed
+User.safeParse(bad);                 // { success: false, error: { issues } }
+        </code></pre>
+          <p class="demo-callout">
+            Same schema = runtime validator + compile-time type. Zero
+            duplication.
+          </p>
+        </section>
+
+        <!-- DEMO 5 (Zod): JSON Schema → Zod -->
+        <section>
+          <h2>
+            <span class="demo-tag">DEMO 5</span> JSON Schema → Zod — the bridge
+          </h2>
+          <pre><code class="hljs language-bash" data-trim>
+cd ~/ApicurioAndZod/demo-5
+
+# Programmatic: prints the Zod generated from JSON Schema
+npm run demo:01
+
+# Live: pulls straight from the registry, converts, validates payload
+APICURIO_URL=http://localhost:38080 GROUP_ID=demo ARTIFACT_ID=user \
+  npm run demo:03
+        </code></pre>
+          <p class="demo-callout">
+            Registry delivers JSON Schema. A single function call returns
+            working Zod.
+          </p>
+        </section>
+
+        <!-- Slide 7: Zod Data Service -->
+        <section>
+          <h2>The <span class="accent">Zod Data Service</span></h2>
+          <ul class="bullets">
+            <li>
+              Boots up <strong>empty</strong>. Starts polling Apicurio.
+            </li>
+            <li>
+              For each version: <code>jsonSchemaToZod(schema)</code> → Zod
+              code as a string → live validator.
+            </li>
+            <li>
+              Registers a single dynamic route:
+              <code>POST /:groupId/:artifactId/v:version</code>
+            </li>
+            <li>
+              OpenAPI spec rebuilt on every sync, served at
+              <code>/openapi.json</code> — Swagger updates itself.
+            </li>
+          </ul>
+        </section>
+
+        <!-- Slide: Architecture -->
+
+        <!-- Slide: Runtime flow -->
+        <section>
+          <h2>Runtime flow</h2>
+          <pre class="mermaid">
+flowchart LR
+  producer["🏭 Producer<br/><span style='font-size:0.75em;opacity:0.7'>POST /:group/:artifact/v:version</span>"]
+  service{{"⚙️ zod-data-service"}}
+  zod["✅ Zod<br/>safeParse"]
+  err["❌ 400<br/>errors[]"]
+  kafka["📨 Kafka topic"]
+  db[("🗃️ Database table")]
+
+  producer -- "JSON payload" --> service
+  service --> zod
+  zod -- "invalid" --> err
+  zod -- "valid + labels" --> kafka
+  zod -- "valid + labels" --> db
+
+  classDef src fill:#1e293b,stroke:#475569,color:#e2e8f0
+  classDef ok fill:#065f46,stroke:#10b981,color:#ecfdf5
+  classDef bad fill:#7f1d1d,stroke:#ef4444,color:#fef2f2
+  classDef sink fill:#0f172a,stroke:#334155,color:#cbd5e1
+  class producer src
+  class service,zod ok
+  class err bad
+  class kafka,db sink
+          </pre>
+          <p class="demo-callout">
+            Artifact labels (<code>pipeline.actions</code>,
+            <code>pipeline.kafka.topic</code>,
+            <code>pipeline.database.table</code>) decide the destination.
+            Invalid data never enters the pipeline.
+          </p>
+        </section>
+
+        <!-- Slide 12: Tradeoffs -->
+        <section>
+          <h2>Honest tradeoffs</h2>
+          <div class="two-columns">
+            <div class="column column--good">
+              <h3>What you gain</h3>
+              <ul>
+                <li>
+                  <strong>Pipeline can't break on bad data.</strong>
+                  Invalid payload → 400 at the boundary; Kafka and DB only
+                  ever see what the schema accepted.
+                </li>
+                <li>
+                  <strong>Producers own delivery.</strong> No more scraping
+                  logs or chasing tables — whoever creates the data POSTs it,
+                  inside the contract they signed off on.
+                </li>
+                <li>
+                  <strong>Endpoint + validator generated from the schema.</strong>
+                  Merge a JSON Schema → route, Zod check, OpenAPI entry
+                  appear. Nothing hand-written, nothing to drift.
+                </li>
+                <li>
+                  <strong>Breaks fail in CI, not in prod.</strong> Apicurio
+                  dry-run on the PR; branch protection holds the line before
+                  the consumer ever sees it.
+                </li>
+              </ul>
+            </div>
+            <div class="column column--bad">
+              <h3>What you pay</h3>
+              <ul>
+                <li>
+                  <strong>Extra hop between producer and pipeline.</strong>
+                  Net-new service to run, deploy, monitor, and bill for.
+                  Adds a network jump and a place that can be down.
+                </li>
+                <li>
+                  <strong>Registry becomes load-bearing.</strong> If Apicurio
+                  is wrong, stale, or unavailable, every consumer is wrong
+                  with it. Needs HA, backups, and a locked write path —
+                  CI-only, never humans.
+                </li>
+                <li>
+                  <strong>Validator scales with traffic, not schema count.</strong>
+                  Every event goes through Zod before the pipeline. Throughput
+                  ceiling = validator throughput. Horizontal scale and
+                  back-pressure planning are now your problem.
+                </li>
+                <li>
+                  <strong><code>BACKWARD</code> checks shape, not meaning.</strong>
+                  Required field added → blocked. Enum value
+                  <em>reinterpreted</em> → invisible. Schema gate ≠ semantic
+                  contract; versioning discipline is still on you.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Slide 13: Conclusions -->
+        <section class="conclusion-slide">
+          <h2>Conclusions</h2>
+          <ol class="conclusions">
+            <li>
+              <span class="big-num">1</span>
+              <p>
+                The validator that <strong>never</strong> falls out of sync<br />is
+                the one <span class="accent">you didn't write</span>.
+              </p>
+            </li>
+            <li>
+              <span class="big-num">2</span>
+              <p>
+                Compatibility gate on PR catches breaks<br /><strong
+                  >before</strong
+                >
+                the consumer.
+              </p>
+            </li>
+            <li>
+              <span class="big-num">3</span>
+              <p>
+                Runtime registry + dynamic routing:<br />"deploy a new
+                endpoint" = "<span class="accent">merge a PR</span
+                >".
+              </p>
+            </li>
+          </ol>
+          <p class="thanks">Thank you. Questions?</p>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+    <script>
+      Reveal.initialize({
+        hash: true,
+        slideNumber: "c/t",
+        transition: "slide",
+        transitionSpeed: "fast",
+        controls: true,
+        progress: true,
+        center: false,
+        width: 1280,
+        height: 800,
+        margin: 0.06,
+        minScale: 0.4,
+        maxScale: 1.6,
+        plugins: [RevealHighlight, RevealNotes],
+      });
+    </script>
+
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: "dark",
+        themeVariables: {
+          background: "transparent",
+          primaryColor: "#1e293b",
+          primaryTextColor: "#e2e8f0",
+          primaryBorderColor: "#475569",
+          lineColor: "#94a3b8",
+          fontSize: "24px",
+          fontFamily: "Inter, system-ui, sans-serif",
+        },
+        flowchart: { htmlLabels: true, curve: "basis", padding: 20 },
+      });
+    </script>
+  </body>
+</html>

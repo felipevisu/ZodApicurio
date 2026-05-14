@@ -1,0 +1,31 @@
+{
+  "$id": "shipping.shipment-dispatched.v1",
+  "type": "object",
+  "required": ["shipmentId", "orderId", "carrier", "trackingCode", "dispatchedAt"],
+  "properties": {
+    "shipmentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "orderId": {
+      "type": "string"
+    },
+    "carrier": {
+      "type": "string",
+      "enum": ["correios", "fedex", "ups", "dhl", "loggi"]
+    },
+    "trackingCode": {
+      "type": "string",
+      "minLength": 6,
+      "maxLength": 40
+    },
+    "estimatedDeliveryAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "dispatchedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

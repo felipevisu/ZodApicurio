@@ -1,0 +1,20 @@
+{
+  "name": "demo-5-json-schema-to-zod",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "demo:01": "tsx examples/01-programmatic.ts",
+    "demo:02": "tsx examples/02-validate-runtime.ts",
+    "demo:03": "tsx examples/03-from-apicurio.ts",
+    "demo:cli": "json-schema-to-zod -i input-schemas/user.json -o output-schemas/user.generated.ts && echo '---' && cat output-schemas/user.generated.ts"
+  },
+  "dependencies": {
+    "json-schema-to-zod": "^2.6.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

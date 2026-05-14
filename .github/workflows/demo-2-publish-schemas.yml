@@ -1,0 +1,52 @@
+name: demo-2 — publish schemas to Apicurio
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "demo-2/schemas/**/*.json"
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: demo-2
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Determine changed schemas
+        id: changed
+        working-directory: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            FILES=$(find demo-2/schemas -type f -name "*.json" | tr '\n' ' ')
+          else
+            # New files only (Added). Switch to AM to also republish modified files.
+            FILES=$(git diff --name-only --diff-filter=A "${{ github.event.before }}" "${{ github.sha }}" \
+              | grep -E '^demo-2/schemas/.*\.json$' || true)
+            FILES=$(echo "$FILES" | tr '\n' ' ')
+          fi
+          echo "files=${FILES}" >> "$GITHUB_OUTPUT"
+          echo "Will publish: ${FILES:-<none>}"
+
+      - name: Publish changed schemas
+        if: steps.changed.outputs.files != ''
+        working-directory: ${{ github.workspace }}
+        env:
+          APICURIO_URL: ${{ secrets.APICURIO_URL }}
+          WRITE_TOKEN: ${{ secrets.APICURIO_WRITE_TOKEN }}
+          GROUP_ID: ${{ vars.APICURIO_GROUP_ID || 'default' }}
+        run: |
+          set -euo pipefail
+          chmod +x demo-2/scripts/publish-schema.sh
+          for f in ${{ steps.changed.outputs.files }}; do
+            echo "::group::Publish $f"
+            ./demo-2/scripts/publish-schema.sh "$f"
+            echo "::endgroup::"
+          done

@@ -1,0 +1,46 @@
+{
+  "$id": "notifications.email-sent.v2",
+  "type": "object",
+  "required": ["messageId", "to", "subject", "template", "sentAt"],
+  "properties": {
+    "messageId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "to": {
+      "type": "string",
+      "format": "email"
+    },
+    "cc": {
+      "type": "array",
+      "items": { "type": "string", "format": "email" },
+      "maxItems": 50
+    },
+    "subject": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "template": {
+      "type": "string",
+      "enum": [
+        "welcome",
+        "password-reset",
+        "order-confirmation",
+        "shipment-update",
+        "marketing",
+        "invoice",
+        "abandoned-cart",
+        "newsletter"
+      ]
+    },
+    "provider": {
+      "type": "string",
+      "enum": ["sendgrid", "ses", "postmark", "mailgun", "resend", "smtp2go"]
+    },
+    "sentAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

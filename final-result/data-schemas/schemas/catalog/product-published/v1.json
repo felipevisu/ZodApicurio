@@ -1,0 +1,63 @@
+{
+  "$id": "catalog.product-published.v1",
+  "type": "object",
+  "required": ["productId", "name", "price", "category", "publishedAt"],
+  "properties": {
+    "productId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 5000
+    },
+    "price": {
+      "type": "number",
+      "minimum": 0
+    },
+    "currency": {
+      "type": "string",
+      "enum": ["BRL", "USD", "EUR"],
+      "default": "BRL"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "electronics",
+        "clothing",
+        "books",
+        "home",
+        "toys",
+        "food",
+        "beauty",
+        "sports"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "maxItems": 20,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 40
+      }
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

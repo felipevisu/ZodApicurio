@@ -1,0 +1,65 @@
+services:
+  apicurio-registry:
+    image: apicurio/apicurio-registry:3.0.6
+    container_name: demo1-apicurio-registry
+    environment:
+      QUARKUS_HTTP_CORS_ORIGINS: "*"
+      APICURIO_STORAGE_KIND: "sql"
+      APICURIO_STORAGE_SQL_KIND: "postgresql"
+      APICURIO_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/apicurio"
+      APICURIO_DATASOURCE_USERNAME: "apicurio"
+      APICURIO_DATASOURCE_PASSWORD: "apicurio"
+    networks:
+      - demo-1
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  apicurio-ui:
+    image: apicurio/apicurio-registry-ui:3.0.6
+    container_name: demo1-apicurio-ui
+    environment:
+      REGISTRY_API_URL: "/apis/registry/v3"
+    networks:
+      - demo-1
+    depends_on:
+      - apicurio-registry
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: demo1-nginx
+    ports:
+      - "18080:8080"
+      - "18888:8888"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - demo-1
+    depends_on:
+      - apicurio-registry
+      - apicurio-ui
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: demo1-apicurio-postgres
+    environment:
+      POSTGRES_DB: apicurio
+      POSTGRES_USER: apicurio
+      POSTGRES_PASSWORD: apicurio
+    volumes:
+      - apicurio-pg-data:/var/lib/postgresql/data
+    networks:
+      - demo-1
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apicurio -d apicurio"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  apicurio-pg-data:
+
+networks:
+  demo-1:
+    name: demo-1
+    driver: bridge

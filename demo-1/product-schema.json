@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/product.json",
+  "title": "Product",
+  "description": "A product available in the catalog",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique product identifier"
+    },
+    "sku": {
+      "type": "string",
+      "pattern": "^[A-Z0-9-]{4,20}$",
+      "description": "Stock keeping unit"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 2000
+    },
+    "price": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "number",
+          "minimum": 0,
+          "exclusiveMinimum": 0
+        },
+        "currency": {
+          "type": "string",
+          "enum": ["USD", "EUR", "BRL", "GBP"]
+        }
+      },
+      "required": ["amount", "currency"]
+    },
+    "category": {
+      "type": "string",
+      "enum": ["electronics", "clothing", "books", "home", "sports", "other"]
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "maxItems": 20
+    },
+    "inStock": {
+      "type": "boolean",
+      "default": true
+    },
+    "stockQuantity": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["id", "sku", "name", "price", "category"],
+  "additionalProperties": false
+}

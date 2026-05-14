@@ -1,0 +1,9 @@
+{
+  "name": "Product Published",
+  "compatibility": "BACKWARD",
+  "labels": {
+    "pipeline.actions": "kafka,database",
+    "pipeline.kafka.topic": "catalog.product-published",
+    "pipeline.database.table": "products"
+  }
+}

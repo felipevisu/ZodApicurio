@@ -1,0 +1,38 @@
+{
+  "$id": "payments.refund-issued.v1",
+  "type": "object",
+  "required": ["refundId", "paymentId", "amount", "currency", "reason", "issuedAt"],
+  "properties": {
+    "refundId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "paymentId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "amount": {
+      "type": "number",
+      "minimum": 0.01
+    },
+    "currency": {
+      "type": "string",
+      "enum": ["BRL", "USD", "EUR"]
+    },
+    "reason": {
+      "type": "string",
+      "enum": ["customer-request", "fraud", "duplicate", "chargeback", "error"]
+    },
+    "partial": {
+      "type": "boolean"
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "issuedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
